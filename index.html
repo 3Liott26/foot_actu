@@ -688,3 +688,125 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<script>
+const API_KEY = '60d09454b8af4214b6d5398509b15e22'; // ← remplace ici
+const CACHE_DURATION = 60 * 60 * 1000; // 1 heure en ms
+
+async function fetchFootball(endpoint) {
+  const cacheKey = 'ultras_' + endpoint;
+  const cached = localStorage.getItem(cacheKey);
+  const cachedTime = localStorage.getItem(cacheKey + '_time');
+
+  // Si données en cache < 1h, on les réutilise
+  if (cached && cachedTime && Date.now() - cachedTime < CACHE_DURATION) {
+    return JSON.parse(cached);
+  }
+
+  try {
+    const res = await fetch('https://api.football-data.org/v4/' + endpoint, {
+      headers: { 'X-Auth-Token': API_KEY }
+    });
+    const data = await res.json();
+    localStorage.setItem(cacheKey, JSON.stringify(data));
+    localStorage.setItem(cacheKey + '_time', Date.now());
+    return data;
+  } catch (e) {
+    console.error('API error:', e);
+    return cached ? JSON.parse(cached) : null;
+  }
+}
+
+// ── Mise à jour du classement ──
+async function updateStandings() {
+  const data = await fetchFootball('competitions/FL1/standings'); // Ligue 1
+  if (!data?.standings) return;
+
+  const rows = data.standings[0].table.slice(0, 9);
+  const wrap = document.querySelector('.standings-wrap');
+  const header = wrap.querySelector('.standings-head');
+
+  // Vide les anciennes lignes
+  wrap.innerHTML = '';
+  wrap.appendChild(header);
+
+  rows.forEach(row => {
+    const div = document.createElement('div');
+    const isTop3 = row.position <= 3;
+    const isDanger = row.position >= 16;
+    div.className = 'standings-row' + (isTop3 ? ' highlighted' : '') + (isDanger ? ' danger' : '');
+    div.innerHTML = `
+      <div class="rank">${row.position}</div>
+      <div class="club-name">
+        <img src="${row.team.crest}" style="width:14px;height:14px;object-fit:contain"> 
+        ${row.team.shortName}
+      </div>
+      <div class="stat-cell">${row.playedGames}</div>
+      <div class="stat-cell">${row.won}</div>
+      <div class="stat-cell">${row.draw}</div>
+      <div class="stat-cell">${row.lost}</div>
+      <div class="pts-cell">${row.points}</div>
+    `;
+    wrap.appendChild(div);
+  });
+
+  document.getElementById('last-update').textContent =
+    'Mis à jour : ' + new Date().toLocaleTimeString('fr-FR');
+}
+
+// ── Mise à jour des matchs en cours ──
+async function updateLiveMatches() {
+  const data = await fetchFootball('matches?status=LIVE');
+  if (!data?.matches?.length) return;
+
+  const match = data.matches[0];
+  const score = match.score.fullTime;
+
+  document.querySelector('.match-badge').textContent =
+    '⚡ En cours — ' + (match.minute || '?') + "'";
+  document.querySelector('.team:first-child .team-name').textContent =
+    match.homeTeam.shortName;
+  document.querySelector('.team:last-child .team-name').textContent =
+    match.awayTeam.shortName;
+  document.querySelector('.match-score').innerHTML =
+    `${score.home ?? 0}<span> — </span>${score.away ?? 0}`;
+}
+
+// ── Mise à jour du ticker ──
+async function updateTicker() {
+  const data = await fetchFootball('matches?dateFrom=' +
+    new Date().toISOString().split('T')[0] + '&competitions=FL1,CL,PL');
+  if (!data?.matches) return;
+
+  const items = data.matches.slice(0, 8).map(m => {
+    const h = m.score.fullTime.home ?? '?';
+    const a = m.score.fullTime.away ?? '?';
+    const status = m.status === 'FINISHED' ? '— Terminé' :
+                   m.status === 'IN_PLAY' ? `(${m.minute}')` : m.utcDate.slice(11, 16);
+    return `<span class="ticker-item">${m.homeTeam.shortName} ${h}–${a} ${m.awayTeam.shortName} ${status}</span>`;
+  }).join('');
+
+  document.querySelector('.ticker-inner').innerHTML = items + items; // doublon pour boucle
+}
+
+// ── Lancement ──
+async function refreshAll() {
+  await Promise.all([updateStandings(), updateLiveMatches(), updateTicker()]);
+}
+
+// Premier chargement
+refreshAll();
+
+// Refresh automatique toutes les heures
+setInterval(refreshAll, CACHE_DURATION);
+
+// Refresh si l'onglet redevient visible après 1h d'inactivité
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    const lastTime = localStorage.getItem('ultras_matches?status=LIVE_time');
+    if (!lastTime || Date.now() - lastTime > CACHE_DURATION) refreshAll();
+  }
+});
+</script>
+
+
+<div id="last-update" style="text-align:right;font-size:0.75rem;color:#888;margin-top:8px;font-family:monospace"></div>
