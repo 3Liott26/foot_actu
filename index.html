@@ -1,1 +1,621 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ULTRAS — Le foot, rien que le foot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00c853;
+    --green-dark: #007c32;
+    --white: #f5f5f0;
+    --off-white: #e8e8e0;
+    --black: #0a0a0a;
+    --dark: #111;
+    --mid: #1e1e1e;
+    --gray: #888;
+    --accent: #ff3d00;
+  }
 
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    overflow-x: hidden;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 56px;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem; letter-spacing: 3px;
+    color: var(--green); text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--gray);
+    text-decoration: none; transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-live {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 2px;
+    color: var(--accent);
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+    animation: pulse 1.2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+
+  .hero {
+    margin-top: 56px; min-height: calc(100vh - 56px);
+    display: grid; grid-template-columns: 1fr 1fr;
+    position: relative; overflow: hidden;
+  }
+  .hero-left {
+    padding: 6rem 3rem 4rem;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; z-index: 2;
+  }
+  .hero-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 4px;
+    text-transform: uppercase; color: var(--green);
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-tag::before { content: ''; display: block; width: 30px; height: 2px; background: var(--green); }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 8vw, 7rem);
+    line-height: 0.95; letter-spacing: 2px; margin-bottom: 1.5rem;
+    animation: fadeUp .8s ease both;
+  }
+  .hero-title em { color: var(--green); font-style: normal; }
+  .hero-sub {
+    font-size: 1.05rem; color: var(--gray); line-height: 1.7;
+    max-width: 400px; margin-bottom: 2.5rem;
+    animation: fadeUp .8s .15s ease both;
+  }
+  .hero-cta { display: flex; gap: 1rem; align-items: center; animation: fadeUp .8s .3s ease both; }
+  .btn-primary {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; text-decoration: none;
+    background: var(--green); color: var(--black);
+    padding: 14px 28px; border-radius: 2px;
+    transition: background .2s, transform .15s;
+    border: none; cursor: pointer;
+  }
+  .btn-primary:hover { background: #33d668; transform: translateY(-2px); }
+  .btn-secondary {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; text-decoration: none;
+    color: var(--white); border-bottom: 2px solid var(--white);
+    padding-bottom: 2px; transition: color .2s, border-color .2s;
+  }
+  .btn-secondary:hover { color: var(--green); border-color: var(--green); }
+  .hero-right {
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-bg-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 28vw; line-height: 1;
+    color: rgba(255,255,255,0.025);
+    position: absolute; right: -2rem; top: 50%;
+    transform: translateY(-50%); user-select: none;
+  }
+  .hero-card {
+    background: var(--mid); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px; padding: 2rem;
+    width: 85%; max-width: 400px; position: relative; z-index: 2;
+    animation: fadeIn 1s .4s ease both;
+  }
+  .match-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; background: var(--accent);
+    color: #fff; display: inline-block; padding: 4px 10px; margin-bottom: 1.5rem;
+  }
+  .match-teams { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .team { text-align: center; flex: 1; }
+  .team-badge {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem;
+    margin: 0 auto 8px;
+  }
+  .team-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .match-score {
+    font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem;
+    letter-spacing: 4px; color: var(--white);
+    text-align: center; padding: 0 1rem; flex: 0 0 auto;
+  }
+  .match-score span { color: var(--green); }
+  .match-info {
+    display: flex; gap: 1rem; justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem; margin-top: 1rem;
+  }
+  .match-stat { text-align: center; flex: 1; }
+  .match-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--green); }
+  .match-stat-label { font-size: 0.7rem; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; }
+
+  .ticker { background: var(--green); overflow: hidden; padding: 10px 0; }
+  .ticker-inner {
+    display: flex; gap: 3rem;
+    animation: ticker 30s linear infinite; white-space: nowrap;
+  }
+  .ticker-item {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--black);
+    display: flex; gap: 10px; align-items: center;
+  }
+  .ticker-item::before { content: '⚽'; font-size: 0.75rem; }
+  @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+  section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
+  .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 3rem; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 2px; }
+  .section-title span { color: var(--green); }
+  .section-link {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--gray); text-decoration: none;
+    border-bottom: 1px solid var(--gray); transition: color .2s, border-color .2s;
+  }
+  .section-link:hover { color: var(--green); border-color: var(--green); }
+
+  .news-grid {
+    display: grid; grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto auto; gap: 1.5px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .news-card { background: var(--dark); overflow: hidden; position: relative; cursor: pointer; transition: background .2s; }
+  .news-card:hover { background: #161616; }
+  .news-card.featured { grid-row: span 2; }
+  .news-img-placeholder {
+    width: 100%; aspect-ratio: 16/9;
+    background: var(--mid); position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .news-card.featured .news-img-placeholder { aspect-ratio: 4/3; }
+  .news-body { padding: 1.25rem; }
+  .news-cat {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--green); margin-bottom: .5rem;
+  }
+  .news-head {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.25rem; font-weight: 700; line-height: 1.2; margin-bottom: .5rem;
+  }
+  .news-card.featured .news-head { font-size: 1.8rem; }
+  .news-meta { font-size: 0.75rem; color: var(--gray); }
+
+  .standings-wrap { background: var(--dark); border: 1px solid rgba(255,255,255,0.06); overflow: hidden; }
+  .standings-head {
+    display: grid; grid-template-columns: 32px 1fr 36px 36px 36px 36px 60px;
+    padding: 10px 16px; background: rgba(255,255,255,0.04);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--gray); gap: 8px;
+  }
+  .standings-row {
+    display: grid; grid-template-columns: 32px 1fr 36px 36px 36px 36px 60px;
+    padding: 10px 16px; gap: 8px; align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    transition: background .15s; cursor: default;
+  }
+  .standings-row:hover { background: rgba(255,255,255,0.03); }
+  .standings-row.highlighted { background: rgba(0,200,83,0.06); border-left: 3px solid var(--green); }
+  .standings-row.danger { border-left: 3px solid var(--accent); background: rgba(255,61,0,0.04); }
+  .rank { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--gray); text-align: center; }
+  .standings-row.highlighted .rank { color: var(--green); }
+  .club-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 0.95rem; letter-spacing: 0.5px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .club-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .stat-cell { font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; text-align: center; color: var(--off-white); }
+  .pts-cell { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; text-align: center; color: var(--white); }
+  .standings-row.highlighted .pts-cell { color: var(--green); }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(255,255,255,0.06); }
+  .stat-box {
+    background: var(--dark); padding: 2rem 1.5rem;
+    position: relative; overflow: hidden; transition: background .2s;
+  }
+  .stat-box:hover { background: #161616; }
+  .stat-box::before {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: var(--green); transform: scaleX(0); transform-origin: left;
+    transition: transform .3s ease;
+  }
+  .stat-box:hover::before { transform: scaleX(1); }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; color: var(--green); line-height: 1; margin-bottom: .25rem; }
+  .stat-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); }
+  .stat-sub { font-size: 0.8rem; color: rgba(255,255,255,0.3); margin-top: 4px; }
+
+  .poll-wrap { background: var(--dark); border: 1px solid rgba(255,255,255,0.06); padding: 2rem; }
+  .poll-q { font-family: 'Barlow Condensed', sans-serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; }
+  .poll-option { margin-bottom: 1rem; cursor: pointer; }
+  .poll-option-label { display: flex; justify-content: space-between; align-items: center; font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; color: var(--off-white); }
+  .poll-pct { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--green); }
+  .poll-bar-bg { height: 6px; background: rgba(255,255,255,0.08); border-radius: 1px; overflow: hidden; }
+  .poll-bar { height: 100%; background: var(--green); border-radius: 1px; transition: width .6s ease; }
+  .poll-option:nth-child(3) .poll-bar { background: #2980b9; }
+  .poll-option:nth-child(4) .poll-bar { background: #8e44ad; }
+
+  .forum-list { display: flex; flex-direction: column; gap: 1px; background: rgba(255,255,255,0.04); }
+  .forum-item {
+    background: var(--dark); padding: 1.25rem 1.5rem;
+    display: flex; align-items: center; gap: 1.25rem;
+    cursor: pointer; transition: background .15s;
+  }
+  .forum-item:hover { background: #161616; }
+  .forum-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 1rem; flex-shrink: 0;
+  }
+  .forum-content { flex: 1; }
+  .forum-title { font-family: 'Barlow Condensed', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; }
+  .forum-meta { font-size: 0.75rem; color: var(--gray); }
+  .forum-replies { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--gray); text-align: center; min-width: 40px; }
+  .forum-hot { color: var(--accent); }
+
+  footer {
+    background: var(--dark); border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 3rem 2rem; max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem;
+  }
+  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 3px; color: var(--green); display: block; margin-bottom: .75rem; }
+  .footer-desc { font-size: 0.85rem; color: var(--gray); line-height: 1.7; }
+  .footer-col h4 { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); margin-bottom: 1rem; }
+  .footer-col a { display: block; text-decoration: none; font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-bottom: .5rem; transition: color .2s; }
+  .footer-col a:hover { color: var(--green); }
+  .footer-bottom { max-width: 1200px; margin: 0 auto; padding: 1.25rem 2rem; border-top: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--gray); }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+  @media(max-width:768px){
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .news-grid { grid-template-columns: 1fr; }
+    .news-card.featured { grid-row: auto; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    footer { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; }
+    .standings-head, .standings-row { grid-template-columns: 28px 1fr 32px 32px 50px; }
+    .standings-head > *:nth-child(4), .standings-head > *:nth-child(5),
+    .standings-row > *:nth-child(4), .standings-row > *:nth-child(5) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">ULTRAS</a>
+  <ul class="nav-links">
+    <li><a href="#actu">Actualités</a></li>
+    <li><a href="#classement">Classement</a></li>
+    <li><a href="#stats">Stats</a></li>
+    <li><a href="#forum">Forum</a></li>
+  </ul>
+  <div class="nav-live"><div class="live-dot"></div>LIVE</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Ligue 1 — Saison 2024/25</div>
+    <h1 class="hero-title">LE FOOT<br>C'EST<br><em>SACRÉ.</em></h1>
+    <p class="hero-sub">Résultats en direct, analyses tactiques, classements et le forum des vrais fans. Tout ce qu'il faut pour vivre le foot à fond.</p>
+    <div class="hero-cta">
+      <a href="#actu" class="btn-primary">Voir les actus</a>
+      <a href="#forum" class="btn-secondary">Rejoindre le débat →</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-bg-num">9</div>
+    <div class="hero-card">
+      <div class="match-badge">⚡ En cours — 67'</div>
+      <div class="match-teams">
+        <div class="team">
+          <div class="team-badge" style="background:#1a3a6a;color:#fff">PSG</div>
+          <div class="team-name">Paris SG</div>
+        </div>
+        <div class="match-score">2<span> — </span>1</div>
+        <div class="team">
+          <div class="team-badge" style="background:#d00;color:#fff">OLY</div>
+          <div class="team-name">Marseille</div>
+        </div>
+      </div>
+      <div class="match-info">
+        <div class="match-stat"><div class="match-stat-val">68%</div><div class="match-stat-label">Possession</div></div>
+        <div class="match-stat"><div class="match-stat-val">7</div><div class="match-stat-label">Tirs</div></div>
+        <div class="match-stat"><div class="match-stat-val">3</div><div class="match-stat-label">Corners</div></div>
+        <div class="match-stat"><div class="match-stat-val">2</div><div class="match-stat-label">Cartons</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">PSG 2–1 Marseille (67')</span>
+    <span class="ticker-item">Lyon 0–0 Monaco (45')</span>
+    <span class="ticker-item">Mbappé : 22 buts cette saison</span>
+    <span class="ticker-item">Nice 3–1 Rennes — Terminé</span>
+    <span class="ticker-item">Lens 1–2 Lille — Terminé</span>
+    <span class="ticker-item">Prochain: Real Madrid vs Barça — Samedi 21h00</span>
+    <span class="ticker-item">PSG 2–1 Marseille (67')</span>
+    <span class="ticker-item">Lyon 0–0 Monaco (45')</span>
+    <span class="ticker-item">Mbappé : 22 buts cette saison</span>
+    <span class="ticker-item">Nice 3–1 Rennes — Terminé</span>
+    <span class="ticker-item">Lens 1–2 Lille — Terminé</span>
+    <span class="ticker-item">Prochain: Real Madrid vs Barça — Samedi 21h00</span>
+  </div>
+</div>
+
+<section id="actu" style="max-width:1200px;margin:0 auto;padding:5rem 2rem">
+  <div class="section-header">
+    <h2 class="section-title">ACTUA<span>LITÉS</span></h2>
+    <a href="#" class="section-link">Toutes les actus</a>
+  </div>
+  <div class="news-grid">
+    <div class="news-card featured">
+      <div class="news-img-placeholder">
+        <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <rect width="400" height="300" fill="#1a3a1a"/>
+          <rect x="20" y="20" width="360" height="260" fill="none" stroke="#2a5a2a" stroke-width="2"/>
+          <line x1="200" y1="20" x2="200" y2="280" stroke="#2a5a2a" stroke-width="1.5"/>
+          <circle cx="200" cy="150" r="50" fill="none" stroke="#2a5a2a" stroke-width="1.5"/>
+          <circle cx="200" cy="150" r="3" fill="#2a5a2a"/>
+          <rect x="20" y="100" width="50" height="100" fill="none" stroke="#2a5a2a" stroke-width="1.5"/>
+          <rect x="330" y="100" width="50" height="100" fill="none" stroke="#2a5a2a" stroke-width="1.5"/>
+          <circle cx="150" cy="120" r="8" fill="#00c853" opacity="0.7"/>
+          <circle cx="200" cy="150" r="8" fill="#00c853" opacity="0.7"/>
+          <circle cx="260" cy="130" r="8" fill="#00c853" opacity="0.7"/>
+          <circle cx="180" cy="200" r="8" fill="#ff3d00" opacity="0.7"/>
+          <circle cx="230" cy="180" r="8" fill="#ff3d00" opacity="0.7"/>
+          <circle cx="310" cy="160" r="8" fill="#ff3d00" opacity="0.7"/>
+          <path d="M200 150 Q240 100 280 80" stroke="#f8f800" stroke-width="1.5" fill="none" stroke-dasharray="4,3" opacity="0.6"/>
+          <circle cx="280" cy="80" r="5" fill="#f8f800" opacity="0.8"/>
+        </svg>
+        <div style="position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(to top,#111 0%,transparent 100%)"></div>
+      </div>
+      <div class="news-body">
+        <div class="news-cat">Analyse tactique</div>
+        <div class="news-head">Le 4-3-3 de Luis Enrique révolutionne le jeu parisien cette saison</div>
+        <div class="news-meta">Il y a 2 heures · 8 min de lecture</div>
+      </div>
+    </div>
+    <div class="news-card">
+      <div class="news-img-placeholder" style="aspect-ratio:16/7">
+        <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <rect width="200" height="80" fill="#1a1a3a"/>
+          <circle cx="100" cy="40" r="30" fill="none" stroke="#4a4a8a" stroke-width="1"/>
+          <line x1="100" y1="0" x2="100" y2="80" stroke="#4a4a8a" stroke-width="0.5"/>
+          <circle cx="60" cy="35" r="6" fill="#2980b9" opacity="0.8"/>
+          <circle cx="140" cy="45" r="6" fill="#e74c3c" opacity="0.8"/>
+        </svg>
+        <div style="position:absolute;bottom:0;left:0;right:0;height:70%;background:linear-gradient(to top,#111 0%,transparent 100%)"></div>
+      </div>
+      <div class="news-body">
+        <div class="news-cat">Transferts</div>
+        <div class="news-head">Real Madrid s'offre Bellingham prolongé — 180M€</div>
+        <div class="news-meta">Il y a 4 heures</div>
+      </div>
+    </div>
+    <div class="news-card">
+      <div class="news-img-placeholder" style="aspect-ratio:16/7">
+        <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+          <rect width="200" height="80" fill="#1a2a1a"/>
+          <rect x="10" y="10" width="180" height="60" fill="none" stroke="#2a5a2a" stroke-width="1"/>
+          <line x1="100" y1="10" x2="100" y2="70" stroke="#2a5a2a" stroke-width="0.5"/>
+          <circle cx="80" cy="40" r="5" fill="#f39c12" opacity="0.9"/>
+          <path d="M80 40 L130 25" stroke="#f8f800" stroke-width="1" stroke-dasharray="3,2" opacity="0.7"/>
+          <circle cx="130" cy="25" r="4" fill="#f8f800"/>
+        </svg>
+        <div style="position:absolute;bottom:0;left:0;right:0;height:70%;background:linear-gradient(to top,#111 0%,transparent 100%)"></div>
+      </div>
+      <div class="news-body">
+        <div class="news-cat">Ligue des Champions</div>
+        <div class="news-head">Bayern vs Arsenal : préliminaires explosifs ce soir</div>
+        <div class="news-meta">Il y a 6 heures</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="classement" style="max-width:1200px;margin:0 auto;padding:0 2rem 5rem">
+  <div class="section-header">
+    <h2 class="section-title">CLASS<span>EMENT</span></h2>
+    <a href="#" class="section-link">Ligue 1</a>
+  </div>
+  <div class="standings-wrap">
+    <div class="standings-head">
+      <div>#</div><div>Club</div><div>J</div><div>G</div><div>N</div><div>P</div><div>PTS</div>
+    </div>
+    <script>
+    const teams=[
+      {r:1,name:'Paris SG',color:'#1a3a6a',j:28,g:22,n:3,p:3,pts:69,hl:true},
+      {r:2,name:'Monaco',color:'#e63946',j:28,g:18,n:5,p:5,pts:59},
+      {r:3,name:'Marseille',color:'#00aaff',j:28,g:17,n:4,p:7,pts:55},
+      {r:4,name:'Lyon',color:'#555',j:28,g:15,n:6,p:7,pts:51},
+      {r:5,name:'Lille',color:'#c0392b',j:28,g:14,n:7,p:7,pts:49},
+      {r:6,name:'Nice',color:'#e74c3c',j:28,g:13,n:5,p:10,pts:44},
+      {r:7,name:'Lens',color:'#f39c12',j:28,g:12,n:5,p:11,pts:41},
+      {r:8,name:'Rennes',color:'#c0392b',j:28,g:11,n:5,p:12,pts:38},
+      {r:16,name:'Metz',color:'#8e44ad',j:28,g:6,n:4,p:18,pts:22,danger:true},
+    ];
+    document.write(teams.map(t=>`
+    <div class="standings-row${t.hl?' highlighted':''}${t.danger?' danger':''}">
+      <div class="rank">${t.r}</div>
+      <div class="club-name"><span class="club-dot" style="background:${t.color}"></span>${t.name}</div>
+      <div class="stat-cell">${t.j}</div>
+      <div class="stat-cell">${t.g}</div>
+      <div class="stat-cell">${t.n}</div>
+      <div class="stat-cell">${t.p}</div>
+      <div class="pts-cell">${t.pts}</div>
+    </div>`).join(''));
+    </script>
+  </div>
+</section>
+
+<section id="stats" style="max-width:1200px;margin:0 auto;padding:0 2rem 5rem">
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:2rem">
+    <div>
+      <div class="section-header">
+        <h2 class="section-title">STATS <span>SAISON</span></h2>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-num">847</div><div class="stat-label">Buts marqués</div><div class="stat-sub">Ligue 1 — J28</div></div>
+        <div class="stat-box"><div class="stat-num">22</div><div class="stat-label">Top buteur</div><div class="stat-sub">Mbappé (PSG)</div></div>
+        <div class="stat-box"><div class="stat-num">15</div><div class="stat-label">Top passeur</div><div class="stat-sub">Griezmann (ATL)</div></div>
+        <div class="stat-box"><div class="stat-num">94%</div><div class="stat-label">Passes PSG</div><div class="stat-sub">Précision</div></div>
+        <div class="stat-box"><div class="stat-num">38</div><div class="stat-label">Clean sheets</div><div class="stat-sub">Cette saison</div></div>
+        <div class="stat-box"><div class="stat-num">3.2</div><div class="stat-label">Buts/match</div><div class="stat-sub">Moyenne L1</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="section-header">
+        <h2 class="section-title">SOND<span>AGE</span></h2>
+      </div>
+      <div class="poll-wrap">
+        <div class="poll-q">Qui remportera la Ligue 1 cette saison ?</div>
+        <div class="poll-option">
+          <div class="poll-option-label"><span>Paris SG</span><span class="poll-pct">62%</span></div>
+          <div class="poll-bar-bg"><div class="poll-bar" style="width:62%"></div></div>
+        </div>
+        <div class="poll-option">
+          <div class="poll-option-label"><span>Monaco</span><span class="poll-pct">21%</span></div>
+          <div class="poll-bar-bg"><div class="poll-bar" style="width:21%"></div></div>
+        </div>
+        <div class="poll-option">
+          <div class="poll-option-label"><span>Marseille</span><span class="poll-pct">11%</span></div>
+          <div class="poll-bar-bg"><div class="poll-bar" style="width:11%"></div></div>
+        </div>
+        <div class="poll-option">
+          <div class="poll-option-label"><span>Autre</span><span class="poll-pct">6%</span></div>
+          <div class="poll-bar-bg"><div class="poll-bar" style="width:6%"></div></div>
+        </div>
+        <div style="margin-top:1.5rem">
+          <button class="btn-primary" style="width:100%;padding:10px" onclick="this.textContent='Voté ✓';this.disabled=true">Voter</button>
+        </div>
+        <div style="margin-top:.75rem;font-size:.75rem;color:var(--gray)">4 827 votes · Mise à jour il y a 1h</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="forum" style="max-width:1200px;margin:0 auto;padding:0 2rem 5rem">
+  <div class="section-header">
+    <h2 class="section-title">FOR<span>UM</span></h2>
+    <a href="#" class="section-link">Tous les sujets</a>
+  </div>
+  <div class="forum-list">
+    <div class="forum-item">
+      <div class="forum-avatar" style="background:#1a3a6a;color:#6af">RM</div>
+      <div class="forum-content">
+        <div class="forum-title forum-hot">🔥 Débat : PSG peut-il gagner la CL cette saison ?</div>
+        <div class="forum-meta">par <strong>ParisLegend</strong> · il y a 30 min</div>
+      </div>
+      <div class="forum-replies forum-hot">247</div>
+    </div>
+    <div class="forum-item">
+      <div class="forum-avatar" style="background:#2a1a4a;color:#a6f">KL</div>
+      <div class="forum-content">
+        <div class="forum-title">Le meilleur XI de la décennie — votez !</div>
+        <div class="forum-meta">par <strong>Klopp_Fan</strong> · il y a 2h</div>
+      </div>
+      <div class="forum-replies">183</div>
+    </div>
+    <div class="forum-item">
+      <div class="forum-avatar" style="background:#3a1a1a;color:#f88">JD</div>
+      <div class="forum-content">
+        <div class="forum-title">Analyse : pourquoi Marseille s'effondre à l'extérieur ?</div>
+        <div class="forum-meta">par <strong>JordiDeluxe</strong> · il y a 3h</div>
+      </div>
+      <div class="forum-replies">96</div>
+    </div>
+    <div class="forum-item">
+      <div class="forum-avatar" style="background:#1a3a1a;color:#8f8">TF</div>
+      <div class="forum-content">
+        <div class="forum-title forum-hot">🔥 Mercato d'été : vos rumeurs et pronostics</div>
+        <div class="forum-meta">par <strong>TransferGuru</strong> · il y a 5h</div>
+      </div>
+      <div class="forum-replies forum-hot">412</div>
+    </div>
+    <div class="forum-item">
+      <div class="forum-avatar" style="background:#3a2a1a;color:#fb8">SB</div>
+      <div class="forum-content">
+        <div class="forum-title">Comparaison : Zidane vs Messi — le débat éternel</div>
+        <div class="forum-meta">par <strong>SoccerBrain</strong> · il y a 7h</div>
+      </div>
+      <div class="forum-replies">74</div>
+    </div>
+  </div>
+  <div style="margin-top:1rem;text-align:center">
+    <button class="btn-primary" onclick="alert('Connecte-toi pour poster !')">+ Nouveau sujet</button>
+  </div>
+</section>
+
+<div style="background:var(--dark);border-top:1px solid rgba(255,255,255,0.06)">
+  <footer>
+    <div class="footer-brand">
+      <span class="footer-logo">ULTRAS</span>
+      <p class="footer-desc">Le site des vrais fans de foot. Résultats, analyses, classements et débats — tout en un.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Compétitions</h4>
+      <a href="#">Ligue 1</a>
+      <a href="#">Champions League</a>
+      <a href="#">Premier League</a>
+      <a href="#">La Liga</a>
+    </div>
+    <div class="footer-col">
+      <h4>Rubriques</h4>
+      <a href="#">Actualités</a>
+      <a href="#">Transferts</a>
+      <a href="#">Vidéos</a>
+      <a href="#">Podcasts</a>
+    </div>
+    <div class="footer-col">
+      <h4>Communauté</h4>
+      <a href="#">Forum</a>
+      <a href="#">Pronostics</a>
+      <a href="#">Fantasy</a>
+      <a href="#">Contact</a>
+    </div>
+  </footer>
+  <div class="footer-bottom">
+    <span>© 2025 ULTRAS — Tous droits réservés</span>
+    <span>Fait avec passion ⚽</span>
+  </div>
+</div>
+
+</body>
+</html>
