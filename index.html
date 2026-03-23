@@ -619,3 +619,72 @@
 
 </body>
 </html>
+<!-- Bouton dans la nav (remplace .nav-live) -->
+<div style="display:flex;align-items:center;gap:1.25rem">
+  <div class="nav-live"><div class="live-dot"></div>LIVE</div>
+  <button class="btn-login" id="btn-open-login" onclick="openModal()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="8" r="4"/>
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+    </svg>
+    Connexion
+  </button>
+  <div class="nav-avatar" id="nav-avatar" onclick="toggleAvatarMenu()">
+    <span id="avatar-initials">?</span>
+    <div class="nav-avatar-menu" id="avatar-menu">
+      <a href="#">Mon profil</a>
+      <a href="#">Mes pronostics</a>
+      <a href="#">Paramètres</a>
+      <a href="#" class="logout" onclick="logout(event)">Déconnexion</a>
+    </div>
+  </div>
+</div>
+
+<!-- Modale (juste avant </body>) -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-logo">ULTRAS</div>
+    <div class="modal-sub">Rejoins la communauté des vrais fans</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-login" onclick="switchTab('login')">Connexion</button>
+      <button class="modal-tab" id="tab-register" onclick="switchTab('register')">Inscription</button>
+    </div>
+    <form class="modal-form" id="form-login" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="login-email" placeholder="ton@email.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mot de passe</label>
+        <input class="form-input" type="password" id="login-pass" placeholder="••••••••" required>
+      </div>
+      <div class="form-error" id="login-error"></div>
+      <button class="form-submit" type="submit">Se connecter</button>
+      <div class="form-divider">ou continuer avec</div>
+      <div class="social-login">
+        <button class="social-btn" type="button" onclick="socialLogin('Google')">Google</button>
+        <button class="social-btn" type="button" onclick="socialLogin('Facebook')">Facebook</button>
+        <button class="social-btn" type="button" onclick="socialLogin('Twitter')">Twitter</button>
+      </div>
+    </form>
+    <form class="modal-form hidden" id="form-register" onsubmit="handleRegister(event)">
+      <div class="form-group">
+        <label class="form-label">Pseudo</label>
+        <input class="form-input" type="text" id="reg-pseudo" placeholder="UltraFan77" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="reg-email" placeholder="ton@email.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mot de passe</label>
+        <input class="form-input" type="password" id="reg-pass" placeholder="8 caractères minimum" required minlength="8">
+      </div>
+      <div class="form-error" id="reg-error"></div>
+      <button class="form-submit" type="submit">Créer mon compte</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
